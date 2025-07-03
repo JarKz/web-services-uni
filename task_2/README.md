@@ -20,7 +20,8 @@ Setup with docker-compose:
 docker-compose up -d
 ```
 
-> [!NOTE] For some of us need to use `sudo` or change the current user to root if it is need. It's only for setup.
+> [!NOTE]
+> For some of us need to use `sudo` or change the current user to root if it is need. It's only for setup.
 >
 > The database user and password in yaml file are example and shouldn't be used for production.
 
@@ -30,7 +31,8 @@ Run SeaORM migration:
 sea migrate up -u "postgres://postgres:test@localhost/orders" # "postgres://{user}:{password}@{host}/{database_name}"
 ```
 
-> [!NOTE] The entities are generated and don't neet te bo re:generated.
+> [!NOTE]
+> The entities are generated and don't neet te bo re:generated.
 
 ### Run service
 

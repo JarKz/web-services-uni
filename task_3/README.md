@@ -12,7 +12,7 @@ I'll provide the steps to reach the result of working service.
 
 ### Google OAuth2 setup
 
-Need to visit (Google OAuth2 Service)[https://console.cloud.google.com/auth/clients] under your google account and create the client for your appliation. The main things that you need to get from this service: `Client ID` and `Client secret`.
+Need to visit [Google OAuth2 Service](https://console.cloud.google.com/auth/clients) under your google account and create the client for your appliation. The main things that you need to get from this service: `Client ID` and `Client secret`.
 
 > [!WARNING]
 > DON'T SHARE YOUR `Client ID` AND `Client secret` TO ANYONE. OTHERWISE REWOKE THEM. I WARNED YOU :)
