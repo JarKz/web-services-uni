@@ -1,0 +1,37 @@
+---
+services:
+  database:
+    image: 'postgres:latest'
+    ports:
+      - 5432:5432
+
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: test
+      POSTGRES_DB: orders
+
+    networks:
+      - postgres-network
+
+  pgadmin:
+    image: dpage/pgadmin4
+
+    ports:
+      - 15433:80
+
+    depends_on:
+      - database
+
+    environment:
+      PGADMIN_DEFAULT_EMAIL: example@mail.com
+      PGADMIN_DEFAULT_PASSWORD: test
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: test
+      POSTGRES_DB: orders
+
+    networks:
+      - postgres-network
+
+networks:
+  postgres-network:
+    driver: bridge
