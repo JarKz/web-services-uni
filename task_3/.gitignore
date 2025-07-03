@@ -1,0 +1,5 @@
+# Ignore the environment file
+.env
+
+# Ignore rust build directory
+/target
