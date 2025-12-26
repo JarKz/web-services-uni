@@ -1,0 +1,5 @@
+# Ignore the target folder
+target/
+users.db
+
+*/target/
