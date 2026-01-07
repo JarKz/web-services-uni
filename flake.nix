@@ -30,6 +30,9 @@
       devShells."${system}".default = pkgs.mkShell {
         packages = with pkgs; [
           sea-orm-cli
+          openssl
+          minikube
+          kubectl
         ];
 
         buildInputs = with pkgs; [

@@ -1,0 +1,24 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: borrowing-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: borrowing-service
+  template:
+    metadata:
+      labels:
+        app: borrowing-service
+    spec:
+      containers:
+        - name: borrowing-service
+          image: borrowing_service:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8000
+          envFrom:
+            - configMapRef:
+                name: borrowing-service
