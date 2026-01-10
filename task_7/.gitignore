@@ -1,0 +1,4 @@
+# Ignore the target folder
+target/
+
+*/target/

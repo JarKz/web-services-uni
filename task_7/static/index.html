@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <title>Крестики-Нолики</title>
+  <style>
+    :root {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+        Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      font-size: 18px;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    #log {
+      width: 30em;
+      height: 20em;
+      overflow: auto;
+      margin: 0.5em 0;
+
+      border: 1px solid black;
+    }
+
+    #status {
+      padding: 0 0.2em;
+    }
+
+    #text {
+      width: 17em;
+      padding: 0.5em;
+    }
+
+    .msg {
+      margin: 0;
+      padding: 0.25em 0.5em;
+    }
+
+    .msg--status {
+      /* a light yellow */
+      background-color: #ffffc9;
+    }
+
+    .msg--error {
+      background-color: pink;
+    }
+
+    .game-board {
+      text-align: center;
+      margin: 0.5em 0;
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(3, 100px);
+      grid-template-rows: repeat(3, 100px);
+      gap: 8px;
+    }
+
+    .cell {
+      background: white;
+      border: 2px solid #2e3470;
+      border-radius: 12px;
+      font-size: 3rem;
+      font-weight: bold;
+      color: #ffffff;
+      cursor: pointer;
+      position: relative;
+      transition: background 0.15s ease, transform 0.05s ease;
+    }
+
+    .cell:hover {
+      background: rgba(128, 128, 128, 0.3);
+    }
+
+    .cell:active {
+      transform: scale(0.97);
+    }
+
+    .cell:disabled {
+      cursor: default;
+      background: #14173a;
+    }
+
+    .mark {
+      width: inherit;
+      height: inherit;
+
+      /* position: absolute; */
+      display: none;
+      /* по умолчанию скрыто */
+    }
+
+    /* крестик */
+    .mark.x {
+      display: block;
+    }
+
+    .mark.x::before,
+    .mark.x::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 50%;
+      width: 10px;
+      height: 100%;
+      background: #4fc3f7;
+      transform: translateX(-50%) rotate(45deg);
+      border-radius: 2px;
+    }
+
+    .mark.x::after {
+      transform: translateX(-50%) rotate(-45deg);
+    }
+
+    /* нолик */
+    .mark.o {
+      position: absolute;
+      top: 10%;
+      left: 10%;
+      display: block;
+      border: 6px solid #ff8a65;
+      border-radius: 50%;
+      width: 80%;
+      height: 80%;
+      box-sizing: border-box;
+    }
+
+    .info-bar {
+      margin: 20px 0;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .status-mark {
+      width: 40px;
+      height: 40px;
+
+      position: relative;
+    }
+
+    .control-bar {
+      display: flex;
+      gap: 20px;
+    }
+
+    .game-btn.start {
+      background: linear-gradient(135deg, #4caf50, #2e7d32);
+    }
+
+    .game-btn.restart {
+      background: linear-gradient(135deg, #ffb74d, #f57c00);
+    }
+
+    .game-btn.stop {
+      background: linear-gradient(135deg, #ef5350, #c62828);
+    }
+
+    .game-btn {
+      padding: 12px 28px;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #ffffff;
+      background: linear-gradient(135deg, #4fc3f7, #3f51b5);
+      border: none;
+      border-radius: 999px;
+      cursor: pointer;
+
+      box-shadow:
+        0 6px 20px rgba(79, 195, 247, 0.35),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+
+      transition:
+        transform 0.12s ease,
+        box-shadow 0.12s ease,
+        filter 0.12s ease;
+    }
+
+    .game-btn:hover {
+      filter: brightness(1.05);
+    }
+
+    .game-btn:active {
+      transform: translateY(2px);
+      box-shadow:
+        0 3px 10px rgba(79, 195, 247, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    }
+
+    .game-btn:disabled {
+      cursor: not-allowed;
+      filter: grayscale(0.7);
+      opacity: 0.6;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Крестики-Нолики</h1>
+  <div>
+    <button id="connect">Connect</button>
+    <span>Status:</span>
+    <span id="status">disconnected</span>
+  </div>
+  <main class="game-board">
+    <div class="board">
+      <button class="cell" data-row="0" data-col="0"><span class="mark"></span></button>
+      <button class="cell" data-row="0" data-col="1"><span class="mark"></span></button>
+      <button class="cell" data-row="0" data-col="2"><span class="mark"></span></button>
+      <button class="cell" data-row="1" data-col="0"><span class="mark"></span></button>
+      <button class="cell" data-row="1" data-col="1"><span class="mark"></span></button>
+      <button class="cell" data-row="1" data-col="2"><span class="mark"></span></button>
+      <button class="cell" data-row="2" data-col="0"><span class="mark"></span></button>
+      <button class="cell" data-row="2" data-col="1"><span class="mark"></span></button>
+      <button class="cell" data-row="2" data-col="2"><span class="mark"></span></button>
+  </main>
+  <div class="info-bar">
+    <button id="game-btn" class="game-btn start">Start Game</button>
+    You:
+    <div class="status-mark">
+      <span id="user-mark" class="mark x"></span>
+    </div>
+    Turn:
+    <div class="status-mark">
+      <span id="turn-mark" class="mark o"></span>
+    </div>
+  </div>
+  <div id="log"></div>
+  <hr />
+  <script>
+    /** @type {WebSocket | null} */
+    let socket = null
+
+    const $user_mark = document.querySelector("#user-mark");
+    const $turn_mark = document.querySelector("#turn-mark");
+
+    const $status = document.querySelector('#status')
+    const $connectButton = document.querySelector('#connect')
+    const $log = document.querySelector('#log')
+
+    const $game_button = document.querySelector("#game-btn");
+    $game_button.addEventListener("click", (e) => {
+      let data;
+
+      if ($game_button.classList.contains("start") || $game_button.classList.contains("restart")) {
+        data = {
+          kind: "start_game",
+        };
+      } else if ($game_button.classList.contains("stop")) {
+        data = {
+          kind: "stop_game",
+        };
+      }
+
+      if (socket) {
+        socket.send(JSON.stringify(data));
+      } else {
+        log("You must connect to server!", "error");
+      }
+    });
+
+    const cells = document.getElementsByClassName("cell");
+    for (const cell of cells) {
+      cell.addEventListener("click", (e) => {
+        let row = cell.dataset.row;
+        let col = cell.dataset.col;
+
+        let data = {
+          kind: "move",
+          x: Number(row),
+          y: Number(col),
+        };
+
+        if (socket) {
+          socket.send(JSON.stringify(data));
+        }
+      });
+    }
+
+    function log(msg, type = 'status') {
+      $log.innerHTML += `<p class="msg msg--${type}">${msg}</p>`
+      $log.scrollTop += 1000
+    }
+
+    function set_mark(element, mark) {
+      element.classList.remove("x");
+      element.classList.remove("o");
+      element.classList.add(mark)
+    }
+
+    function remove_mark(element, mark) {
+      element.classList.remove("x");
+      element.classList.remove("o");
+    }
+
+    function apply_board(board) {
+      for (const cell of cells) {
+        const row = cell.dataset.row;
+        const col = cell.dataset.col;
+
+        const board_cell = board[row][col];
+        if (board_cell == "empty") {
+          remove_mark(cell.children[0]);
+        } else {
+          set_mark(cell.children[0], board_cell.filled);
+        }
+      }
+    }
+
+    function set_game_button_type(button_type) {
+      $game_button.classList.remove("start");
+      $game_button.classList.remove("stop");
+      $game_button.classList.remove("restart");
+
+      switch (button_type) {
+        case "stop":
+          $game_button.innerHTML = "Leave Game"
+          $game_button.classList.add("stop");
+          break;
+        case "restart":
+          $game_button.innerHTML = "Restart Game"
+          $game_button.classList.add("restart");
+          break;
+        case "start":
+        default:
+          $game_button.innerHTML = "Start Game"
+          $game_button.classList.add("start");
+      }
+    }
+
+    function connect() {
+      disconnect()
+
+      const {location} = window
+
+      const proto = location.protocol.startsWith('https') ? 'wss' : 'ws'
+      const wsUri = `${proto}://${location.host}/ws`
+
+      log('Connecting...')
+      socket = new WebSocket(wsUri)
+
+      socket.onopen = () => {
+        log('Connected')
+        updateConnectionStatus()
+      }
+
+      socket.onmessage = ev => {
+        const data = JSON.parse(ev.data);
+
+        switch (data.kind) {
+          case "info":
+            log(data.message, "message");
+            break;
+          case "bad_request":
+            log(data.message, "error")
+            break;
+          case "game_started":
+            set_mark($user_mark, data.you);
+            set_mark($turn_mark, data.turn_of)
+            apply_board(data.board);
+            set_game_button_type("stop");
+
+            log("Game is started.", "message")
+            break;
+          case "game_ended":
+            set_game_button_type("restart");
+            log(data.reason)
+            log("Game is ended", "message")
+            break;
+          case "game_updated":
+            set_mark($user_mark, data.you);
+            set_mark($turn_mark, data.turn_of)
+            apply_board(data.board);
+
+            log("Game is updated", "message")
+            break;
+          default:
+            log(`Received an unknown message with kind: ${data.kind}`, "error")
+        }
+      }
+
+      socket.onclose = () => {
+        log('Disconnected')
+        socket = null
+        set_game_button_type("start");
+        updateConnectionStatus()
+      }
+    }
+
+    function disconnect() {
+      if (socket) {
+        log('Disconnecting...')
+        socket.close()
+        socket = null;
+
+        set_game_button_type("start");
+
+        updateConnectionStatus()
+      }
+    }
+
+    function updateConnectionStatus() {
+      if (socket) {
+        $status.style.backgroundColor = 'transparent'
+        $status.style.color = 'green'
+        $status.textContent = `connected`
+        $connectButton.innerHTML = 'Disconnect'
+      } else {
+        $status.style.backgroundColor = 'red'
+        $status.style.color = 'white'
+        $status.textContent = 'disconnected'
+        $connectButton.textContent = 'Connect'
+      }
+    }
+
+    $connectButton.addEventListener('click', () => {
+      if (socket) {
+        disconnect()
+      } else {
+        connect()
+      }
+
+      updateConnectionStatus()
+    })
+
+    updateConnectionStatus()
+  </script>
+</body>
+
+</html>
