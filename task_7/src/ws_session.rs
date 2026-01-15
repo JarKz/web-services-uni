@@ -230,7 +230,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsGameSession {
                 let client_message = match serde_json::from_str::<ClientMessage>(text.trim()) {
                     Ok(message) => message,
                     Err(err) => {
-                        log::error!("Received an invalid message: {err}");
+                        log::error!("Received an invalid message. Text: {text}. Error: {err}");
                         ctx.text(format!("Ivalid message. Error: {err}"));
                         return;
                     }

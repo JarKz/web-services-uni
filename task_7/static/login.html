@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login</title>
+<style>
+  /* Reset & basic styling */
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+
+  body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: #f2f2f7;
+  }
+
+  .login-container {
+    background: #fff;
+    padding: 2.5rem 3rem;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 400px;
+  }
+
+  h2 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: #333;
+  }
+
+  .form-group {
+    margin-bottom: 1rem;
+  }
+
+  input[type="text"], input[type="password"] {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.3s;
+  }
+
+  input[type="text"]:focus,
+  input[type="password"]:focus {
+    border-color: #007bff;
+    outline: none;
+  }
+
+  button {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: none;
+    border-radius: 8px;
+    background: #007bff;
+    color: #fff;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+
+  button:hover {
+    background: #0056b3;
+  }
+
+  .register-link {
+    display: block;
+    text-align: center;
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    color: #555;
+    text-decoration: none;
+  }
+
+  .register-link:hover {
+    text-decoration: underline;
+  }
+
+  .error {
+    color: #d9534f;
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+  }
+</style>
+</head>
+<body>
+
+<div class="login-container">
+  <h2>Login</h2>
+  <form id="loginForm">
+    <div class="form-group">
+      <input type="text" id="username" placeholder="Username" required>
+      <div class="error" id="usernameError"></div>
+    </div>
+    <div class="form-group">
+      <input type="password" id="password" placeholder="Password" required>
+      <div class="error" id="passwordError"></div>
+    </div>
+    <button type="submit">Login</button>
+    <a href="/registration" class="register-link">Register</a>
+  </form>
+</div>
+
+<script>
+  const form = document.getElementById('loginForm');
+  const username = document.getElementById('username');
+  const password = document.getElementById('password');
+  const usernameError = document.getElementById('usernameError');
+  const passwordError = document.getElementById('passwordError');
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    let valid = true;
+
+    usernameError.textContent = '';
+    passwordError.textContent = '';
+
+    if (!username.value.trim()) {
+      usernameError.textContent = 'Username is required';
+      valid = false;
+    }
+
+    if (!password.value.trim()) {
+      passwordError.textContent = 'Password is required';
+      valid = false;
+    }
+
+    if (valid) {
+      fetch("/sign-in", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({username: username.value, password: password.value}),
+        redirect: "follow",
+      }).then(response => {
+          if (response.redirected) {
+            window.location.replace(response.url);
+          }
+        });
+    }
+  });
+</script>
+
+</body>
+</html>
+
