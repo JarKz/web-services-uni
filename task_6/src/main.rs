@@ -191,7 +191,7 @@ async fn home(auth_user: AuthUser, db: Data<DatabaseConnection>) -> impl Respond
         .unwrap()
         .unwrap();
 
-    HttpResponse::Ok().body(format!("Hello, {}!", user.username))
+    HttpResponse::Ok().body(format!("Добро пожаловать, {}!", user.username))
 }
 
 #[post("/sign-up")]
