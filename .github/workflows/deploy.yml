@@ -23,15 +23,13 @@ jobs:
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
-          target: ${{ env.TARGET }}
           components: rustfmt, clippy
 
       - name: Install musl gcc tools
         run: sudo apt-get update && sudo apt-get install -y musl-tools gcc-multilib
 
       - name: Run Tests
-        run: |
-          cargo test --workspace --all-features --locked
+        run: cargo test
         working-directory: ./task_6
 
       - name: Build Binary
