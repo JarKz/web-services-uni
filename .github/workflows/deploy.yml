@@ -44,7 +44,8 @@ jobs:
       # 5) Copy binary to server
       - name: Copy binary
         run: |
-          rsync target/${TARGET}/release/${BINARY} \
+          rsync -e "ssh -o StrictHostKeyChecking=no" \
+            target/${TARGET}/release/${BINARY} \
             ${{ secrets.SSH_USER }}@${{ secrets.SERVER_HOST }}:${{ secrets.DEPLOY_PATH }}
         working-directory: ./task_6
 
