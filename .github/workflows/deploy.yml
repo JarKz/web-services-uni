@@ -29,6 +29,11 @@ jobs:
       - name: Install musl gcc tools
         run: sudo apt-get update && sudo apt-get install -y musl-tools gcc-multilib
 
+      - name: Run Tests
+        run: |
+          cargo test --workspace --all-features --locked
+        working-directory: ./task_6
+
       - name: Build Binary
         run: |
           rustup target add $TARGET
@@ -44,8 +49,7 @@ jobs:
       # 5) Copy binary to server
       - name: Copy binary
         run: |
-          scp -o StrictHostKeyChecking=no \
-            target/${TARGET}/release/${BINARY} \
+          rsync target/${TARGET}/release/${BINARY} \
             ${{ secrets.SSH_USER }}@${{ secrets.SERVER_HOST }}:${{ secrets.DEPLOY_PATH }}
         working-directory: ./task_6
 
