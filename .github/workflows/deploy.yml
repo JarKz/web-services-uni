@@ -1,0 +1,57 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build-and-deploy:
+    name: Build and Deploy
+    runs-on: ubuntu-latest
+
+    env:
+      TARGET: x86_64-unknown-linux-musl
+      BINARY: user_service
+      RUSTFLAGS: -C target-feature=+crt-static -C link-args=-static
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          target: ${{ env.TARGET }}
+          components: rustfmt, clippy
+
+      - name: Install musl gcc tools
+        run: sudo apt-get update && sudo apt-get install -y musl-tools gcc-multilib
+
+      - name: Build Binary
+        run: |
+          rustup target add $TARGET
+          cargo build --release --target $TARGET
+        working-directory: ./task_6
+
+      # 4) Prepare SSH
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.7.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      # 5) Copy binary to server
+      - name: Copy binary
+        run: |
+          scp -o StrictHostKeyChecking=no \
+            target/${TARGET}/release/${BINARY} \
+            ${{ secrets.SSH_USER }}@${{ secrets.SERVER_HOST }}:${{ secrets.DEPLOY_PATH }}
+        working-directory: ./task_6
+
+      # 6) Restart service
+      - name: Restart service
+        run: |
+          ssh -o StrictHostKeyChecking=no \
+            ${{ secrets.SSH_USER }}@${{ secrets.SERVER_HOST }} \
+            "sudo systemctl restart ${BINARY}.service"
